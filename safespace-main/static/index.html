@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSpace - Cyberbullying Free Social</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=3">
+</head>
+<body>
+
+<!-- Landing Page -->
+<div id="landingPage" class="landing-container">
+    <!-- Animated Dynamic Background -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="landing-hero" style="position: relative; z-index: 10;">
+        <div class="header-animate">
+            <div class="badge-hero">Security First</div>
+            <h1>Welcome to SafeSpace</h1>
+            <p>Next-Gen Cyberbullying Detection Platform</p>
+        </div>
+        
+        <div id="loginOptions" class="options-animate" style="display:flex; justify-content:center; gap: 1.5rem; margin-top: 2.5rem;">
+            <div class="glass glass-card" onclick="showLoginForm('user')">
+                <div class="icon-wrapper primary-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h3>User Portal</h3>
+                <p>Browse feed & connect</p>
+            </div>
+            
+            <div class="glass glass-card" onclick="showLoginForm('admin')">
+                <div class="icon-wrapper danger-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M12 12v.01"/><path d="M8 12v.01"/><path d="M16 12v.01"/></svg>
+                </div>
+                <h3>Admin Portal</h3>
+                <p>Manage AI safety models</p>
+            </div>
+        </div>
+        
+        <div id="authForm" class="glass auth-animate" style="display:none; max-width:420px; margin: 2.5rem auto 0 auto; text-align:left; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <h2 id="authTitle" style="margin-bottom: 1.5rem; text-align: center; font-size: 1.75rem; letter-spacing: 0.5px;">Welcome Back</h2>
+            <div id="authError" class="cyberbullying-alert" style="color:var(--danger)"></div>
+            <div class="input-group" id="emailGroup" style="display:none;">
+                <label class="input-label">Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="email" class="input-field" placeholder="Enter your email">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="username" class="input-field" placeholder="Enter your username">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" class="input-field" placeholder="Enter your password">
+                </div>
+            </div>
+            <div class="input-group" id="confirmGroup" style="display:none;">
+                <label class="input-label">Confirm Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="confirmPassword" class="input-field" placeholder="Verify your password">
+                </div>
+            </div>
+            
+            <button onclick="handleAuth(true)" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; margin-bottom: 1rem; padding: 0.85rem; font-size: 1rem; font-weight: 600;" id="submitBtn">Login</button>
+            
+            <div id="toggleAuthBtn" class="auth-toggle-link" onclick="toggleAuthMode()">
+                New to SafeSpace? <span>Register now</span>
+            </div>
+            
+            <button onclick="backToOptions()" class="btn btn-outline" style="width: 100%; border:none; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">← Back to options</button>
+        </div>
+    </div>
+</div>
+
+<!-- Main UI -->
+<div id="mainUI" style="display: none; animation: fadeIn 0.4s ease-out;">
+    <nav class="navbar glass">
+        <h1 style="color: var(--primary);">SafeSpace</h1>
+        <div class="nav-links">
+            <a onclick="switchTab('feed')" class="nav-link active" id="nav-feed">Feed</a>
+            <a onclick="switchTab('post')" class="nav-link" id="nav-post">Post</a>
+            <a onclick="switchTab('profile')" class="nav-link" id="nav-profile">Profile</a>
+            <a onclick="logout()" class="nav-link" style="color: var(--danger)">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Feed Tab -->
+        <div id="feedTab" class="tab-content active">
+            <div class="feed-container" id="feedContainer">
+                <p>Loading posts...</p>
+                <!-- Posts injected here via JS -->
+            </div>
+        </div>
+
+        <!-- Post Tab -->
+        <div id="postTab" class="tab-content">
+            <div class="glass" style="max-width: 600px; margin: 2rem auto; padding: 2.5rem; border-radius: 24px; background: linear-gradient(145deg, rgba(30,41,59,0.5) 0%, rgba(15,23,42,0.8) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width:50px; height:50px; border-radius:12px; background:linear-gradient(135deg, #00e5bc, #6366f1); display:flex; align-items:center; justify-content:center; color:white;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="margin:0; font-size: 1.5rem; letter-spacing: 0.5px;">Create New Post</h2>
+                        <span style="color:var(--text-secondary); font-size:0.9rem;">Share moments safely</span>
+                    </div>
+                </div>
+                
+                <div id="postError" class="cyberbullying-alert" style="border-radius: 12px; margin-bottom: 1.5rem;"></div>
+                
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label class="input-label" style="font-weight:600; letter-spacing:1px;">Media Upload</label>
+                    <div style="position:relative;">
+                        <input type="file" id="postImage" accept="image/*" class="input-field" style="padding: 1rem; background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px; cursor:pointer;">
+                    </div>
+                </div>
+                
+                <div class="input-group" style="margin-bottom: 2rem;">
+                    <label class="input-label" style="font-weight:600; letter-spacing:1px; display:flex; align-items:center;">
+                        Description
+                        <span style="color:#94a3b8; font-weight:normal; font-size:0.85rem; margin-left:0.5rem; background: rgba(255,255,255,0.05); padding: 0.2rem 0.5rem; border-radius: 6px;">(Optional)</span>
+                    </label>
+                    <textarea id="postDesc" class="input-field" rows="3" placeholder="Leave empty to focus purely on the visual..." style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1rem; resize:vertical; opacity: 0.8; transition: opacity 0.2s;" onfocus="this.style.opacity='1'" onblur="if(!this.value) this.style.opacity='0.8'"></textarea>
+                </div>
+                
+                <div style="display:flex; gap: 1rem;">
+                    <button onclick="uploadPost(true)" class="btn" style="flex:1; border-radius: 12px; padding: 1rem; font-weight:bold; background: rgba(244, 63, 94, 0.1); border: 1px solid #f43f5e; color: #f43f5e; display:flex; align-items:center; justify-content:center; gap:0.5rem; transition:all 0.3s;" onmouseover="this.style.background='rgba(244, 63, 94, 0.2)'" onmouseout="this.style.background='rgba(244, 63, 94, 0.1)'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Meme
+                    </button>
+                    <button onclick="uploadPost(false)" class="btn" style="flex:1; border-radius: 12px; padding: 1rem; font-weight:bold; background: linear-gradient(135deg, #00e5bc, #6366f1); border: none; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow: 0 10px 20px rgba(99,102,241,0.2); transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Upload Photo
+                    </button>
+                </div>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; border-left: 4px solid #6366f1;">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin:0; line-height:1.5;">
+                        <strong style="color:white;">Meme Analysis:</strong> Triggers our specialized AI OCR scanning pipeline.<br>
+                        <strong style="color:white;">Upload Photo:</strong> Standard secure posting bypassing deep-pixel analysis.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profileTab" class="tab-content">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 2rem;">
+                <h2 style="margin:0; font-size:1.75rem; letter-spacing:1px;">Your Profile</h2>
+                <span style="padding:0.5rem 1rem; background:rgba(0,229,188,0.1); color:#00e5bc; border-radius:99px; font-size:0.85rem; font-weight:bold;">SafeSpace Verified</span>
+            </div>
+            
+            <!-- User Identity Specifics -->
+            <div id="profileDetails" class="glass" style="padding: 2rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; border-radius: 20px; background: linear-gradient(135deg, rgba(30,41,59,0.4) 0%, rgba(15,23,42,0.6) 100%);">
+                <div class="avatar" style="width: 80px; height: 80px; font-size: 2.5rem; background: linear-gradient(135deg, #10b981, #3b82f6); box-shadow: 0 10px 25px rgba(16,185,129,0.3); border: 3px solid rgba(255,255,255,0.1);" id="profAvatar">U</div>
+                <div>
+                    <h3 id="profUsername" style="margin: 0 0 0.25rem 0; color: white; font-size:1.5rem; letter-spacing:0.5px;">Loading...</h3>
+                    <p id="profEmail" style="margin: 0; color: #94a3b8; font-size: 0.95rem;">...</p>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:1.5rem; margin-bottom:2rem;">
+                <div style="background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.8)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; display:flex; flex-direction:column; justify-content:center; align-items:center; transition:transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <span style="color:#94a3b8; text-transform:uppercase; font-size:0.85rem; letter-spacing:1px; margin-bottom:0.5rem;">Account Strikes</span>
+                    <div id="prof-strikes" style="font-size:3rem; font-weight:bold; color:white; line-height:1;">0</div>
+                </div>
+                
+                <div style="background: linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.8)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.3s;" onclick="toggleSafetyDetails()" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <span style="color:#94a3b8; text-transform:uppercase; font-size:0.85rem; letter-spacing:1px; margin-bottom:0.5rem;">Hate Measure</span>
+                    <div style="display:flex; align-items:baseline; gap:0.5rem;">
+                        <span id="prof-safety" style="font-size:3rem; font-weight:bold; color:#00e5bc; line-height:1;">0%</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="safetyDetails" style="padding: 1.5rem; margin-bottom: 2rem; display: none; background: rgba(0,0,0,0.2); border-left: 4px solid #00e5bc; border-radius: 12px; animation: slideUp 0.3s ease;">
+                <h3 style="color: white; margin-bottom: 0.5rem; font-size:1.1rem;">Safety Breakdown & Telemetry</h3>
+                <p style="color: #cbd5e1; font-size: 0.95rem; line-height:1.6; margin:0;">
+                    This percentage is based on the volume of cyberbullying comments directed at your posts that our machine learning architecture successfully neutralized. 
+                    If this reaches 100%, it means you've received a significant amount of targeted hate vectors. 
+                    Consider managing privacy settings or reporting severe harassment to moderation.
+                </p>
+            </div>
+
+            <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Strike History</h3>
+            <div id="strikeContainer" style="padding: 1.5rem; margin-bottom: 2.5rem; max-height: 200px; overflow-y: auto; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
+                <p style="color:var(--text-secondary); text-align:center; margin:0;">No strikes found. Keep it up!</p>
+            </div>
+
+            <h3 style="margin-bottom: 1rem; font-size: 1.25rem;">Your Uploads</h3>
+            <div class="post-grid" id="profileGrid" style="gap:1.5rem;">
+                <!-- Profile Posts -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="/static/app.js?v=8"></script>
+</body>
+</html>

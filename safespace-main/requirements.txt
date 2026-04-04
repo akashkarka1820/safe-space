@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+sqlalchemy
+passlib[bcrypt]
+PyJWT
+pandas
+scikit-learn
+xgboost
+tensorflow
+httpx
+pillow
+numpy

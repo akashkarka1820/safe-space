@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSpace - Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar glass" style="border-radius: 0;">
+        <h1 style="color: var(--primary);">SafeSpace Admin</h1>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Main Site</a>
+            <a onclick="logout()" class="nav-link" style="color: var(--danger)">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-grid">
+        <div class="sidebar glass" style="border-radius: 0; min-height: calc(100vh - 80px);">
+            <a onclick="switchPanel('dash')" class="sidebar-link active" id="link-dash">Dashboard Info</a>
+            <a onclick="switchPanel('analytics')" class="sidebar-link" id="link-analytics">Model Analytics</a>
+            <a onclick="switchPanel('models')" class="sidebar-link" id="link-models">Model Description</a>
+            <a onclick="switchPanel('users')" class="sidebar-link" id="link-users">User Management</a>
+        </div>
+
+        <div style="padding: 2rem;">
+
+            <!-- Dashboard Info -->
+            <div id="dashPanel" class="admin-panel active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">Platform Telemetry</h2>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(34, 197, 94, 0.1); padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite;"></div>
+                        <span style="color: #4ade80; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">SYSTEM ONLINE</span>
+                    </div>
+                </div>
+                
+                <style>
+                    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+                    .telemetry-card { background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+                    .telemetry-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5); border-color: #3b82f6; }
+                    .telemetry-label { color: #94a3b8; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+                    .telemetry-value { font-size: 2.5rem; font-weight: bold; color: white; display: flex; align-items: baseline; gap: 0.5rem; }
+                    .telemetry-sub { font-size: 0.9rem; color: #10b981; }
+                </style>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="telemetry-card">
+                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.1; font-size: 5rem;">👥</div>
+                        <span class="telemetry-label">Registered Users</span>
+                        <div class="telemetry-value" id="ad-users">0 <span class="telemetry-sub">users</span></div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.1; font-size: 5rem;">🛑</div>
+                        <span class="telemetry-label">Blocked Accounts</span>
+                        <div class="telemetry-value" id="ad-blocked" style="color: #ef4444;">0 <span class="telemetry-sub" style="color: #ef4444;">threats</span></div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.1; font-size: 5rem;">🛡️</div>
+                        <span class="telemetry-label">Intercepted Comments</span>
+                        <div class="telemetry-value" id="ad-tox" style="color: #f59e0b;">0 <span class="telemetry-sub" style="color: #f59e0b;">toxic</span></div>
+                    </div>
+                    <div class="telemetry-card">
+                        <div style="position: absolute; top: -10px; right: -10px; opacity: 0.1; font-size: 5rem;">♥️</div>
+                        <span class="telemetry-label">Platform Health</span>
+                        <div class="telemetry-value" id="ad-health" style="color: #00e5bc;">100 <span class="telemetry-sub" style="color: #00e5bc;">%</span></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem;">
+                    <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="text-transform: uppercase; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 1.5rem; font-weight: 600;">Toxicity Ratio</h3>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="commentChart"></canvas>
+                        </div>
+                    </div>
+                    <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                        <h3 style="text-transform: uppercase; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 1.5rem; font-weight: 600;">Live Inference Load</h3>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="liveTrafficChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Analytics -->
+            <div id="analyticsPanel" class="admin-panel">
+                <h2
+                    style="font-size: 1.75rem; font-weight: bold; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">
+                    Visual Analytics</h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="glass" style="padding: 1.5rem; width: 100%;">
+                        <h3
+                            style="text-transform: uppercase; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 1.5rem; font-weight: 600;">
+                            Text Models — Performance Metrics</h3>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="textModelsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass" style="padding: 1.5rem; width: 100%;">
+                        <h3
+                            style="text-transform: uppercase; color: #94a3b8; font-size: 0.85rem; letter-spacing: 1.5px; margin-bottom: 1.5rem; font-weight: 600;">
+                            Vision Models — Performance Metrics</h3>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="imageModelsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Descriptions -->
+            <div id="modelsPanel" class="admin-panel">
+                <div style="margin-bottom: 3rem;">
+                    <h2 style="font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center;">
+                        <span style="color: #00e5bc; margin-right: 12px; font-size: 1.25rem;">█</span> Text Architectures (NLP)
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #00e5bc; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">XGBOOST</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">Powerful tree-based boosting algorithm. Yields high F1 scores by aggregating hundreds of decision trees voting on term-frequency matrices, effectively overpowering bias and preventing systemic overfitting during heavy comment loads.</p>
+                        </div>
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #00e5bc; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">LOGISTIC REGRESSION</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">Extremely fast and interpretable model for real-time text inference. Casts linear boundaries to separate offensive terms robustly given our TF-IDF embedding constraints.</p>
+                        </div>
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #00e5bc; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">SUPPORT VECTOR MACHINE (SVM)</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">SVM models cast strict hyperplanes in high-dimensional space to isolate toxic semantics. They provide blazing-fast, sub-millisecond inference speeds on edge devices with minimal system topology overhead.</p>
+                        </div>
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #00e5bc; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">STOCHASTIC GRADIENT DESCENT (SGD)</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">An efficient iterative optimization mechanism that updates parameters incrementally. Highly versatile and scalable for massive volumes of text detection without exhausting memory caches.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center;">
+                        <span style="color: #6366f1; margin-right: 12px; font-size: 1.25rem;">█</span> Vision Architectures (CNN)
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #6366f1; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">MOBILENETV2</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">A lightweight network optimizing localized depthwise separable convolutions. Strategically deployed for immediate inference on uploaded memes without causing blocking logic or stalling server event loops—ideal for preliminary gateways.</p>
+                        </div>
+                        <div style="background: #11141d; border: 1px solid #1f2937; border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: #6366f1; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem;">RESNET50</h4>
+                            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">An immense 50-layer framework maintaining systemic stability via Residual "skip-connections" that pass image gradients deeper into the network, completely mitigating vanishing gradients. Operates as our highly-accurate heavy architecture.</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div id="usersPanel" class="admin-panel">
+                <h2>User Management</h2>
+                <div class="glass" style="padding: 1rem; margin-top: 1.5rem; overflow-x: auto;">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Strikes</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/static/admin_app.js?v=3"></script>
+</body>
+
+</html>
